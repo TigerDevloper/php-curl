@@ -1,10 +1,10 @@
 # php-curl
 
 --------------------------------------------------------
-##all the methods for the API are here:
+## all the methods for the API are here:
 https://api-rmelite.ratehighway.com/RateMonitorService/rest/Help
 
-##make this Curl Request work
+## make this Curl Request work
 
 curl -X POST \
  https://api-rmelite.ratehighway.com/RateMonitorService/rest/api/v1/RateMonitor/ShopAdhocRequest \
@@ -36,3 +36,7 @@ curl -X POST \
  "RateType": "4",
  "ExtraCriteria": "null"
 }'
+
+## run multi curl on this webservice:
+
+http://104.248.230.236:8001/?country=UNITED%20STATES&rent_from=*%20PHOENIX%20AIRPORT%20(%20PHX%20)&rent_to=%20PHOENIX%20AIRPORT%20(%20PHX%20)&pick_up_date=05/09/2019&pick_up_time=10:30%20AM&drop_off_date=05/10/2019&10:30%20AM

@@ -13,58 +13,51 @@ $end   = new DateTime( date('Y-m-d',strtotime(str_replace('/', '-', $dateTo))) )
 $begin_2 = new DateTime( date('Y-m-d',strtotime(str_replace('/', '-', $dateFrom))) );
 $end_2   = new DateTime( date('Y-m-d',strtotime(str_replace('/', '-', $dateTo))) );
 
+
+
 $rateOutputReturn=array();
 
-//Prepare data CURL
-$ch_ticker=0;
-for($dt = $begin; $dt <= $end; $dt->modify('+1 day')){
-
-    for($i=$lorFrom;$i<=$lorTo;$i++){
-        $message="";
-
-        echo "<br>1 - loop <br>";
-
-        //Reassigning dates and LOR variables to fit the loop
-        $loopDate=$dt->format("Y-m-d");
-        $lor=$i;
-
-        $ch = curl_init("104.248.230.236:8001/?country=UNITED%20STATES&rent_from=*%20PHOENIX%20AIRPORT%20(%20PHX%20)&rent_to=%20PHOENIX%20AIRPORT%20(%20PHX%20)&pick_up_date=05/09/2019&pick_up_time=10:30%20AM&drop_off_date=05/10/2019&10:30%20AM");
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-
-        $ch_ticker++;
-
-    }
-}
 
 //*************PREPARE DATA CURL
 
 $mh = curl_multi_init();
+
+
+// array of curl handles
+$curly = array();
+
 $ch_ticker=0;
 for($dt_2 = $begin_2; $dt_2 <= $end_2; $dt_2->modify('+1 day')) {
     for ($i = $lorFrom; $i <= $lorTo; $i++) {
-        echo "<br>2 - loop <br>";
+        $ch = curl_init("http://104.248.230.236:8001/?country=UNITED%20STATES&rent_from=*%20PHOENIX%20AIRPORT%20(%20PHX%20)&rent_to=%20PHOENIX%20AIRPORT%20(%20PHX%20)&pick_up_date=05/09/2019&pick_up_time=10:30%20AM&drop_off_date=05/10/2019&10:30%20AM");
 
-        curl_multi_add_handle($mh, $ch);
+        $curly[] = $ch;
+        curl_multi_add_handle($mh, $curly[count($curly) - 1]);
         $ch_ticker++;
     }
 }
 
 
-echo "<br>Count: ch: ".count($ch)."<br>";
+echo "<br>Count: ch: ".count($curly)."<br>";
 
 // execute all queries simultaneously, and continue when all are complete
 $running = null;
 do {
     curl_multi_exec($mh, $running);
-} while ($running);
+} while ($running > 0);
 
 
+// get content and remove handles
+foreach($curly as $id => $c) {
+$result[$id] = curl_multi_getcontent($c);
+curl_multi_remove_handle($mh, $c);
+}
 
-curl_multi_remove_handle($mh, $ch);
+// all done
 curl_multi_close($mh);
 
 
-$response = curl_multi_getcontent($ch);
+return;
 
 echo "<br>response coming up:::<br><pre>";
 echo "$response"; // output results
